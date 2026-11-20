@@ -1,0 +1,8 @@
+agents:
+  queue: local
+
+steps:
+  - label: ":rocket: Deploy ${ARTIFACT_VERSION} to prd"
+    command: node scripts/deploy.mjs prd
+    concurrency: 1
+    concurrency_group: web/deploy/prd

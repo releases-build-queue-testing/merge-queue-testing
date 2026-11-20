@@ -1,0 +1,21 @@
+agents:
+  queue: local
+
+steps:
+  - label: ":rocket: Deploy ${ARTIFACT_VERSION} to stg"
+    command: node scripts/deploy.mjs stg
+    concurrency: 1
+    concurrency_group: web/deploy/stg
+
+  - block: ":shipit: Promote ${ARTIFACT_VERSION} to prd?"
+
+  - label: ":arrow_right: Promote to prd"
+    trigger: web-deploy-prd
+    async: true
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+      message: "Deploy ${ARTIFACT_VERSION}"
+      env:
+        ARTIFACT_VERSION: "${ARTIFACT_VERSION}"
+        ARTIFACT_DIGEST: "${ARTIFACT_DIGEST}"

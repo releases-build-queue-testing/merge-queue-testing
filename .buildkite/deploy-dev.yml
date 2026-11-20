@@ -1,0 +1,21 @@
+agents:
+  queue: local
+
+steps:
+  - label: ":rocket: Deploy ${ARTIFACT_VERSION} to dev"
+    command: node scripts/deploy.mjs dev
+    concurrency: 1
+    concurrency_group: web/deploy/dev
+
+  - wait
+
+  - label: ":arrow_right: Promote to stg"
+    trigger: web-deploy-stg
+    async: true
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+      message: "Deploy ${ARTIFACT_VERSION}"
+      env:
+        ARTIFACT_VERSION: "${ARTIFACT_VERSION}"
+        ARTIFACT_DIGEST: "${ARTIFACT_DIGEST}"
